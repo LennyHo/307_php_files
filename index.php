@@ -10,7 +10,7 @@ echo "Hello, World!";
     <title>Document</title>
 </head>
 <body>
-    
+
 </body>
 </html>
 
