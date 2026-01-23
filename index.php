@@ -4,11 +4,12 @@ session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+    // Validate nickname input if it is not empty. Otherwise, prompt the user to enter a nickname.
     if (empty($_POST['nickname'])) {
         echo "<script>alert('Nickname is required. Please enter your nickname.'); window.location.href='index.php';</script>";
         exit();
     }
-    // Set session variables based on POST data.
+    // Set session variables based on POST data. overall_score is initialized to 0 and selected_topic is set from the form.
     $_SESSION['nickname'] = $nickname = trim($_POST['nickname']);
     $_SESSION['overall_score'] = 0;
     $_SESSION['selected_topic'] = $_POST['topic'];
