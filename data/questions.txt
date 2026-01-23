@@ -1,0 +1,16 @@
+Animals|I am the largest land animal, I have a long trunk, and very large ears.|Elephant
+Animals|I am a flightless bird from Antarctica that loves to swim and eat fish.|Penguin
+Animals|I have a very long neck to reach leaves at the top of trees.|Giraffe
+Animals|I am a black and white bear from China that loves to eat bamboo.|Panda
+Animals|I am known as the King of the Jungle and have a large hairy mane.|Lion
+Animals|I am an Australian animal with a pouch for my baby and I move by hopping.|Kangaroo
+Animals|I am the fastest land animal and I have black spots on my yellow fur.|Cheetah
+Animals|I am a large striped cat that is an excellent swimmer and hunter.|Tiger
+Environment|The Amazon Rainforest produces more than 20% of the world's oxygen.|True
+Environment|Deserts are always hot and never experience freezing temperatures at night.|False
+Environment|Trees can communicate with each other through an underground network of fungi.|True
+Environment|A single lightning bolt can reach temperatures hotter than the surface of the sun.|True
+Environment|Plastic bottles take only about 10 years to completely decompose in the ocean.|False
+Environment|The Great Barrier Reef is the only living structure that can be seen from space.|True
+Environment|Earth is the only planet in our solar system known to have liquid water.|True
+Environment|Mount Everest is the only place on Earth where the air is too thin for plants.|False
