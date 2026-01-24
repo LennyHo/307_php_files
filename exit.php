@@ -9,7 +9,7 @@ $overallScore = $_SESSION['overall_score'] ?? 0;
 // 2. finalize the leaderboard entry
 if (isset($_SESSION['nickname'])) {
     $entry = $nickname . "|" . $overallScore . PHP_EOL;
-    file_put_contents("leaderboard.txt", $entry, FILE_APPEND | LOCK_EX);
+    file_put_contents("data/leaderboard.txt", $entry, FILE_APPEND | LOCK_EX);
 }
 
 // 3. Handle the "Restart Game" button logic
