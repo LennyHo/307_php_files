@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-$filename = "leaderboard.txt";
+$filename = "data/leaderboard.txt";
 $data = [];
 
 // 1. Read and parse the file safely
@@ -39,6 +39,12 @@ if ($sortType == 'name') {
 <body>
     <h1>Quiz Leaderboard</h1>
     <table border="1">
+        <thead>
+            <tr>
+                <th><a href="leaderboard.php?sort=name">Name (Sort A-Z)</a></th>
+                <th><a href="leaderboard.php?sort=score">Score (Sort High-Low)</a></th>
+            </tr>
+        </thead>
         <tbody>
             <?php foreach ($data as $entry): ?>
                 <tr>
@@ -46,10 +52,6 @@ if ($sortType == 'name') {
                     <td><?php echo htmlspecialchars($entry[1]); ?></td>
                 </tr>
             <?php endforeach; ?>
-            <tr>
-                <th><a href="leaderboard.php?sort=name">Name (Sort A-Z)</a></th>
-                <th><a href="leaderboard.php?sort=score">Score (Sort High-Low)</a></th>
-            </tr>
         </tbody>
     </table>
     <br>
