@@ -1,50 +1,59 @@
 <?php
-// leaderboard.php
 session_start();
 
-$lines = file("leaderboard", FILE_IGNORE_NEW_LINES);
+$filename = "leaderboard.txt";
 $data = [];
 
-foreach ($lines as $line) {
-    $data[] = explode(",", $line);
+// 1. Read and parse the file safely
+if (file_exists($filename)) {
+    $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        $parts = explode("|", $line);
+        if (count($parts) == 2) {
+            // trim() removes accidental spaces around names or scores
+            $data[] = [trim($parts[0]), (int)trim($parts[1])];
+        }
+    }
 }
 
+// 2. Sorting Logic
 $sortType = $_GET['sort'] ?? 'score';
-
 if ($sortType == 'name') {
-    // strcasecmp treats 'A' and 'a' as the same value
-    usort($data, function($a, $b) {
-        return strcasecmp($a[0], $b[0]);
-    });
-}else {
-    // Default to score sorting
     usort($data, function ($a, $b) {
-        return $b[1] - $a[1]; // Highest score first
+        return strcasecmp($a[0], $b[0]); // True A-Z sort
+    });
+} else {
+    usort($data, function ($a, $b) {
+        return (int)$b[1] - (int)$a[1]; // Highest score first
     });
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaderboard</title>
+    <title>Quiz Leaderboard</title>
 </head>
 
 <body>
-    <table>
-        <tr>
-            <th><a href="leaderboard.php?sort=name">Name</a></th>
-            <th><a href="leaderboard.php?sort=score">Score</a></th>
-        </tr>
-        <?php foreach ($data as $entry): ?>
+    <h1>Quiz Leaderboard</h1>
+    <table border="1">
+        <tbody>
+            <?php foreach ($data as $entry): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($entry[0]); ?></td>
+                    <td><?php echo htmlspecialchars($entry[1]); ?></td>
+                </tr>
+            <?php endforeach; ?>
             <tr>
-                <td><?php echo htmlspecialchars($entry[0]); ?></td>
-                <td><?php echo htmlspecialchars($entry[1]); ?></td>
+                <th><a href="leaderboard.php?sort=name">Name (Sort A-Z)</a></th>
+                <th><a href="leaderboard.php?sort=score">Score (Sort High-Low)</a></th>
             </tr>
-        <?php endforeach; ?>
+        </tbody>
     </table>
+    <br>
+    <a href="index.php">Restart Game</a>
 </body>
+
 </html>

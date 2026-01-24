@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['nickname'] = $nickname = trim($_POST['nickname']);
     $_SESSION['overall_score'] = 0;
     $_SESSION['selected_topic'] = $_POST['topic'];
-    header('Location: quiz.php');
+    header('Location: quiz_category.php');
     exit();
 }
 ?>
