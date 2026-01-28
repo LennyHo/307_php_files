@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Reset session if user goes to index.php?reset=1
+// 1. Reset session if user goes to index.php?reset=1
 if (isset($_GET['reset'])) {
     session_unset();
     session_destroy();
@@ -9,6 +9,7 @@ if (isset($_GET['reset'])) {
     exit();
 }
 
+// 2. Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($_POST['nickname'])) {
@@ -16,18 +17,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // Store nickname
+    // Capture and clean nickname
     $_SESSION['nickname'] = trim($_POST['nickname']);
+    echo "<script>alert('Welcome, " . htmlspecialchars($_SESSION['nickname']) . "! Get ready for the quiz.');</script>";
 
-    // Only set score to 0 if not set yet (so points can be remembered)
+    // Initialize overall_score only if it doesn't exist yet
     if (!isset($_SESSION['overall_score'])) {
         $_SESSION['overall_score'] = 0;
     }
 
-    // Store selected topic
+    // Store selected topic for the quiz logic
     $_SESSION['selected_topic'] = $_POST['topic'];
 
-    // Go to ONE quiz page
+    // Define the path to your data folder for global use
+    $_SESSION['data_path'] = "data/";
+
     header('Location: quiz_category.php');
     exit();
 }
@@ -35,9 +39,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Quiz Game - Login</title>
 </head>
+
 <body>
     <h1>Welcome to the ISIT307 Quiz!</h1>
 
@@ -54,4 +60,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="submit" value="Start Quiz">
     </form>
 </body>
+
 </html>
