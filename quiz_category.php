@@ -5,9 +5,9 @@ if (!isset($_SESSION['nickname']) || !isset($_SESSION['selected_topic'])) {
     header("Location: index.php");
     exit();
 }
-    if (isset($_POST['topic'])) {
-        $_SESSION['selected_topic'] = $_POST['topic'];
-    }
+if (isset($_POST['topic'])) {
+    $_SESSION['selected_topic'] = $_POST['topic'];
+}
 
 $topic = $_SESSION['selected_topic']; // "Animals" or "Environment"
 $file  = __DIR__ . "/data/questions.txt";
@@ -46,12 +46,14 @@ $_SESSION['current_topic'] = $topic;
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($topic); ?> Topic quiz page</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <div class="container">
         <h2 style="text-align:center;"><?php echo htmlspecialchars($topic); ?> Topic Quiz</h2>
@@ -71,4 +73,5 @@ $_SESSION['current_topic'] = $topic;
         </form>
     </div>
 </body>
+
 </html>

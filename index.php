@@ -39,12 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Game - Login</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <div class="container">
         <h1 style="text-align:center;">Welcome to the ISIT307 Quiz!</h1>
@@ -63,4 +65,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Menu removed as requested -->
     </div>
 </body>
+
 </html>
