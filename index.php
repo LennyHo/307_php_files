@@ -38,27 +38,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Game - Login</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-    <h1>Welcome to the ISIT307 Quiz!</h1>
+    <div class="container">
+        <h1 style="text-align:center;">Welcome to the ISIT307 Quiz!</h1>
+        <form method="post" action="index.php">
+            <label for="nickname">Enter Nickname:</label>
+            <input type="text" id="nickname" name="nickname" required placeholder="Your nickname">
 
-    <form method="post" action="index.php">
-        <label>Enter Nickname:</label>
-        <input type="text" name="nickname" required><br><br>
+            <label for="topic">Select Topic:</label>
+            <select id="topic" name="topic">
+                <option value="Animals">Animals</option>
+                <option value="Environment">Environment</option>
+            </select>
 
-        <label>Select Topic:</label>
-        <select name="topic">
-            <option value="Animals">Animals</option>
-            <option value="Environment">Environment</option>
-        </select><br><br>
-
-        <input type="submit" value="Start Quiz">
-    </form>
+            <input type="submit" value="Start Quiz">
+        </form>
+        <!-- Menu removed as requested -->
+    </div>
 </body>
-
 </html>
