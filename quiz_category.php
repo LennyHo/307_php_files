@@ -49,12 +49,12 @@ $_SESSION['current_topic'] = $topic;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($topic); ?> Quiz</title>
+    <title><?php echo htmlspecialchars($topic); ?> Topic quiz page</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
-        <h2 style="text-align:center;"><?php echo htmlspecialchars($topic); ?> Quiz</h2>
+        <h2 style="text-align:center;"><?php echo htmlspecialchars($topic); ?> Topic Quiz</h2>
         <p style="text-align:center;">Player: <strong><?php echo htmlspecialchars($_SESSION['nickname']); ?></strong></p>
         <form method="post" action="result.php">
             <?php foreach ($selected as $i => $q): ?>
