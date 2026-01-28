@@ -3,8 +3,11 @@ session_start();
 
 // 1. Get data from the quiz session and the form post
 $selectedQuestions = $_SESSION['current_quiz'] ?? [];
+// User's answers from the form submission
 $userAnswers = $_POST['ans'] ?? [];
+// Initialize counters
 $numCorrect = 0;
+// Initialize incorrect counter
 $numIncorrect = 0;
 
 // 2. The Grading Loop
