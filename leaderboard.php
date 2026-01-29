@@ -1,4 +1,8 @@
 <?php
+// ===============
+// Leaderboard.php
+// ===============
+
 session_start();
 
 $filename = "data/leaderboard.txt";
@@ -7,8 +11,8 @@ $malformedLines = [];
 
 // 1. Read and parse the file safely
 if (file_exists($filename)) {
-    $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $lineNum => $line) {
+    $textLines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($textLines as $lineNum => $line) {
         $parts = explode("|", $line);
         if (count($parts) == 2) {
             // trim() removes accidental spaces around names or scores
@@ -19,13 +23,15 @@ if (file_exists($filename)) {
     }
 }
 
-// 2. Sorting Logic
+// 2. Sort the data based on user selection.
 $sortType = $_GET['sort'] ?? 'score';
 if ($sortType == 'name') {
+    // Sort by name A-Z
     usort($data, function ($a, $b) {
-        return strcasecmp($a[0], $b[0]); // True A-Z sort
+        return strcasecmp($a[0], $b[0]); // Case-insensitive alphabetical order
     });
 } else {
+    // Default: Sort by score High-Low
     usort($data, function ($a, $b) {
         return (int)$b[1] - (int)$a[1]; // Highest score first
     });
@@ -38,7 +44,7 @@ if ($sortType == 'name') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaderboard page</title>
+    <title>Leaderboard Page</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 

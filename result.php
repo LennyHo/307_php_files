@@ -16,9 +16,12 @@ foreach ($selectedQuestions as $i => $q) {
     // Check if the user actually answered the question
     $userProvided = isset($userAnswers[$i]) ? strtolower(trim($userAnswers[$i])) : "";
 
+    // Compare answers and update counters.
     if ($userProvided === $correct) {
+        // Correct answer
         $numCorrect++;
     } else {
+        // Incorrect answer
         $numIncorrect++;
     }
 }
