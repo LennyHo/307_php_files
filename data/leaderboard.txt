@@ -1,6 +1,2 @@
-test123|29
-darwase123|26
-hello2|10
-darwasebusta|9
-Lenny12345|8
-test|5
+tEst123|13
+LeN45|11

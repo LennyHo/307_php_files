@@ -31,38 +31,43 @@ if (isset($_SESSION['nickname'])) {
             if (count($parts) == 2) {
                 $existingName = trim($parts[0]);
                 $existingScore = (int)trim($parts[1]);
-                $key = mb_strtolower($existingName);
-                if (!isset($scoreMap[$key])) {
-                    $scoreMap[$key] = ['name' => $existingName, 'score' => $existingScore];
-                } else {
-                    // In case the file has duplicates, accumulate them
-                    $scoreMap[$key]['score'] += $existingScore;
+                $found = false;
+                foreach ($scoreMap as $k => $entry) {
+                    if (strcasecmp($entry['name'], $existingName) === 0) {
+                        $scoreMap[$k]['score'] += $existingScore;
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    $scoreMap[] = ['name' => $existingName, 'score' => $existingScore];
                 }
             }
         }
     }
 
-    // Merge current user's score (case-insensitive)
-    // Use file previous score as base and avoid decreasing a stored score if session appears stale
-    $userKey = mb_strtolower($nickname);
-    $filePrevious = $scoreMap[$userKey]['score'] ?? 0;
-    $finalScore = max($filePrevious, (int)$overallScore);
-    $scoreMap[$userKey] = ['name' => $nickname, 'score' => $finalScore];
-    // Update session to reflect the canonical final score
-    $_SESSION['overall_score'] = $finalScore;
-
-    // Prepare lines to write back (one entry per username)
-    // Sort by score descending for nice ordering
-    uasort($scoreMap, function ($a, $b) {
+    // Merge current user's score (case-insensitive, preserve original casing)
+    $found = false;
+    foreach ($scoreMap as $k => $entry) {
+        if (strcasecmp($entry['name'], $nickname) === 0) {
+            $filePrevious = $scoreMap[$k]['score'];
+            $finalScore = max($filePrevious, (int)$overallScore);
+            $scoreMap[$k]['score'] = $finalScore;
+            $_SESSION['overall_score'] = $finalScore;
+            $found = true;
+            break;
+        }
+    }
+    if (!$found) {
+        $scoreMap[] = ['name' => $nickname, 'score' => (int)$overallScore];
+    }
+    usort($scoreMap, function ($a, $b) {
         return $b['score'] <=> $a['score'];
     });
-
     $outLines = [];
     foreach ($scoreMap as $entry) {
         $outLines[] = $entry['name'] . "|" . $entry['score'];
     }
-
-    // Write the canonicalized leaderboard back to the file with exclusive lock
     file_put_contents($filename, implode(PHP_EOL, $outLines) . PHP_EOL, LOCK_EX);
 
     // Ensure the file on disk is canonicalized and sorted for future reads

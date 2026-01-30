@@ -45,18 +45,33 @@ if (file_exists($filename)) {
         if (count($parts) == 2) {
             $existingName = trim($parts[0]);
             $existingScore = (int)trim($parts[1]);
-            $key = mb_strtolower($existingName);
-            if (!isset($scoreMap[$key])) {
-                $scoreMap[$key] = ['name' => $existingName, 'score' => $existingScore];
-            } else {
-                $scoreMap[$key]['score'] += $existingScore;
+            $found = false;
+            foreach ($scoreMap as $k => $entry) {
+                if (strcasecmp($entry['name'], $existingName) === 0) {
+                    $scoreMap[$k]['score'] += $existingScore;
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $scoreMap[] = ['name' => $existingName, 'score' => $existingScore];
             }
         }
     }
 }
-$userKey = mb_strtolower($nickname);
-$scoreMap[$userKey] = ['name' => $nickname, 'score' => $_SESSION['overall_score']];
-uasort($scoreMap, function ($a, $b) {
+// Update or add the current user's score (case-insensitive, preserve original casing)
+$found = false;
+for ($k = 0; $k < count($scoreMap); $k++) {
+    if (strcasecmp($scoreMap[$k]['name'], $nickname) === 0) {
+        $scoreMap[$k]['score'] = $_SESSION['overall_score'];
+        $found = true;
+        break;
+    }
+}
+if (!$found) {
+    $scoreMap[] = ['name' => $nickname, 'score' => $_SESSION['overall_score']];
+}
+usort($scoreMap, function ($a, $b) {
     return $b['score'] <=> $a['score'];
 });
 $outLines = [];

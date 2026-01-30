@@ -18,8 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // Capture and clean nickname
-    $_SESSION['nickname'] = strtolower(trim($_POST['nickname']));
+    // Capture and clean nickname (preserve original casing)
+    $_SESSION['nickname'] = trim($_POST['nickname']);
     echo "<script>alert('Welcome, " . htmlspecialchars($_SESSION['nickname']) . "! Get ready for the quiz.');</script>";
 
     // Initialize overall_score from data/leaderboard.txt for this nickname.
@@ -28,13 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $initialScore = 0;
     if (file_exists($dataFile)) {
         $lines = file($dataFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        $nickKey = mb_strtolower($_SESSION['nickname']);
+        $nickKey = trim($_SESSION['nickname']);
         foreach ($lines as $ln) {
             $parts = explode("|", $ln);
             if (count($parts) == 2) {
                 $existingName = trim($parts[0]);
                 $existingScore = (int)trim($parts[1]);
-                if (mb_strtolower($existingName) === $nickKey) {
+                if (strcasecmp($existingName, $nickKey) === 0) {
                     $initialScore = $existingScore;
                     break;
                 }

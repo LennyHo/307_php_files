@@ -17,21 +17,24 @@ if (file_exists($filename)) {
         $parts = explode("|", $line);
         if (count($parts) == 2) {
             $rawName = trim($parts[0]);
-            // Use a case-insensitive key so names that differ only by case are combined.
-            $nameKey = mb_strtolower($rawName);
             $score = (int)trim($parts[1]);
-            if (!isset($scoreMap[$nameKey])) {
-                // Preserve the first-seen display name, but aggregate under the lowercase key
-                $scoreMap[$nameKey] = ['name' => $rawName, 'score' => $score];
-            } else {
-                $scoreMap[$nameKey]['score'] += $score;
+            $found = false;
+            foreach ($scoreMap as $k => $entry) {
+                if (strcasecmp($entry['name'], $rawName) === 0) {
+                    $scoreMap[$k]['score'] += $score;
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $scoreMap[] = ['name' => $rawName, 'score' => $score];
             }
         } else {
             $malformedLines[] = $lineNum + 1;
         }
     }
     // Canonicalize and sort stored leaderboard (case-insensitive uniqueness, score descending)
-    uasort($scoreMap, function ($a, $b) {
+    usort($scoreMap, function ($a, $b) {
         return $b['score'] <=> $a['score'];
     });
 
