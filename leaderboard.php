@@ -5,7 +5,7 @@
 
 session_start();
 
-$filename = "leaderboard.txt";
+$filename = __DIR__ . "/data/leaderboard.txt";
 $data = [];
 $malformedLines = [];
 
@@ -30,10 +30,19 @@ if (file_exists($filename)) {
             $malformedLines[] = $lineNum + 1;
         }
     }
-    // Convert to array for sorting and display
+    // Canonicalize and sort stored leaderboard (case-insensitive uniqueness, score descending)
+    uasort($scoreMap, function($a, $b) {
+        return $b['score'] <=> $a['score'];
+    });
+
+    // Rewrite file in canonical form (one entry per username, sorted)
+    $canonicalLines = [];
     foreach ($scoreMap as $entry) {
+        $canonicalLines[] = $entry['name'] . "|" . $entry['score'];
         $data[] = [$entry['name'], $entry['score']];
     }
+    // If file needs updating, write back sorted canonical content
+    file_put_contents($filename, implode(PHP_EOL, $canonicalLines) . PHP_EOL, LOCK_EX);
 }
 
 // 2. Sort the data based on user selection.

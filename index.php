@@ -22,10 +22,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['nickname'] = trim($_POST['nickname']);
     echo "<script>alert('Welcome, " . htmlspecialchars($_SESSION['nickname']) . "! Get ready for the quiz.');</script>";
 
-    // Initialize overall_score only if the user is new. otherwise, keep existing score for existing users.
-    if (!isset($_SESSION['overall_score'])) {
-        $_SESSION['overall_score'] = 0;
+    // Initialize overall_score from data/leaderboard.txt for this nickname.
+    // Overwrite any previous session value so logging in always reflects the file state.
+    $dataFile = __DIR__ . '/data/leaderboard.txt';
+    $initialScore = 0;
+    if (file_exists($dataFile)) {
+        $lines = file($dataFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $nickKey = mb_strtolower($_SESSION['nickname']);
+        foreach ($lines as $ln) {
+            $parts = explode("|", $ln);
+            if (count($parts) == 2) {
+                $existingName = trim($parts[0]);
+                $existingScore = (int)trim($parts[1]);
+                if (mb_strtolower($existingName) === $nickKey) {
+                    $initialScore = $existingScore;
+                    break;
+                }
+            }
+        }
     }
+    $_SESSION['overall_score'] = $initialScore;
 
     // Store the selected topic for the quiz logic.
     $_SESSION['selected_topic'] = $_POST['topic'];

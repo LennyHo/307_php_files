@@ -5,30 +5,72 @@ session_start();
 $selectedQuestions = $_SESSION['current_quiz'] ?? [];
 // User's answers from the form submission
 $userAnswers = $_POST['ans'] ?? [];
-// Initialize counters
-$numCorrect = 0;
-// Initialize incorrect counter
-$numIncorrect = 0;
+// Ensure we have a selected topic to show in the radio buttons
+$selectedTopic = $_SESSION['selected_topic'] ?? 'Animals';
+// Initialize per-question points and total for this round
+$pointsPerQuestion = [];
+$pointsThisRound = 0;
 
-// 2. The Grading Loop
+// capture previous cumulative total from the leaderboard file (source of truth)
+$previousTotal = 0;
+$dataFile = __DIR__ . '/data/leaderboard.txt';
+if (file_exists($dataFile)) {
+    $lines = file($dataFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $nickKey = mb_strtolower($_SESSION['nickname'] ?? '');
+    foreach ($lines as $ln) {
+        $parts = explode("|", $ln);
+        if (count($parts) == 2) {
+            $existingName = trim($parts[0]);
+            $existingScore = (int)trim($parts[1]);
+            if (mb_strtolower($existingName) === $nickKey) {
+                $previousTotal = $existingScore;
+                break;
+            }
+        }
+    }
+}
+
+// 2. The Grading Loop (calculate points per question)
 foreach ($selectedQuestions as $i => $q) {
     $correct = strtolower(trim($q['answer']));
     // Check if the user actually answered the question
     $userProvided = isset($userAnswers[$i]) ? strtolower(trim($userAnswers[$i])) : "";
 
-    // Compare answers and update counters.
+    // Assign points: +2 for correct, -1 for incorrect (including blank answers)
     if ($userProvided === $correct) {
-        // Correct answer
-        $numCorrect++;
+        $pts = 2;
     } else {
-        // Incorrect answer
-        $numIncorrect++;
+        $pts = -1;
+    }
+
+    $pointsPerQuestion[$i] = $pts;
+    $pointsThisRound += $pts;
+}
+
+// Add to cumulative total (base on file's previous total)
+$_SESSION['overall_score'] = $previousTotal + $pointsThisRound; // now session matches file-based total
+
+// Sum positive (correct) and negative (incorrect) points for display
+$correctPoints = 0;
+$incorrectPoints = 0;
+foreach ($pointsPerQuestion as $pts) {
+    if ($pts > 0) {
+        $correctPoints += $pts;
+    } elseif ($pts < 0) {
+        $incorrectPoints += $pts; // negative value
     }
 }
 
-// 3. Scoring Formula: +2 for Correct, -1 for Incorrect
-$pointsThisRound = ($numCorrect * 2) - ($numIncorrect * 1);
-$_SESSION['overall_score'] = ($_SESSION['overall_score'] ?? 0) + $pointsThisRound;
+// Count correct and incorrect answers (for display ordering)
+$numCorrectCount = 0;
+$numIncorrectCount = 0;
+foreach ($pointsPerQuestion as $pts) {
+    if ($pts > 0) {
+        $numCorrectCount++;
+    } elseif ($pts < 0) {
+        $numIncorrectCount++;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -44,9 +86,9 @@ $_SESSION['overall_score'] = ($_SESSION['overall_score'] ?? 0) + $pointsThisRoun
 <body>
     <div class="container">
         <h2 style="text-align:center;">Quiz Results</h2>
-        <p>Correct Answers: <?php echo $numCorrect; ?></p>
-        <p>Incorrect Answers: <?php echo $numIncorrect; ?></p>
-        <p>Points for this round: <strong><?php echo $pointsThisRound; ?></strong></p>
+        <p><strong>Number of Correct:</strong> <?php echo $numCorrectCount; ?></p>
+        <p><strong>Number of Incorrect:</strong> <?php echo $numIncorrectCount; ?></p>
+        <p><strong>Points for this round:</strong> <strong><?php echo $pointsThisRound; ?></strong></p>
         <hr>
         <h3>Total Cumulative Points: <?php echo $_SESSION['overall_score']; ?></h3>
         <form action="quiz_category.php" method="post">
@@ -59,9 +101,9 @@ $_SESSION['overall_score'] = ($_SESSION['overall_score'] ?? 0) + $pointsThisRoun
             </label>
             <br><br>
             <button type="submit">New Quiz</button>
-            <a href="leaderboard.php"><button type="button">Leaderboard</button></a>
-            <a href="exit.php"><button type="button">Exit</button></a>
         </form>
+        <a href="leaderboard.php"><button type="button">Leaderboard</button></a>
+        <a href="exit.php"><button type="button">Exit</button></a>
     </div>
 </body>
 

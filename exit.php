@@ -18,11 +18,55 @@ if (isset($_POST['restart'])) {
     exit();
 }
 
-// 3. Finalize the leaderboard entry appending to leaderboard.txt
+// 3. Finalize the leaderboard entry appending to data/leaderboard.txt
 if (isset($_SESSION['nickname'])) {
-    $entry = $nickname . "|" . $overallScore . PHP_EOL;
-    // Append the entry to leaderboard.txt
-    file_put_contents("leaderboard.txt", $entry, FILE_APPEND | LOCK_EX);
+    $filename = __DIR__ . "/data/leaderboard.txt";
+
+    // Build an associative map of existing scores (case-insensitive keys)
+    $scoreMap = [];
+    if (file_exists($filename)) {
+        $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            $parts = explode("|", $line);
+            if (count($parts) == 2) {
+                $existingName = trim($parts[0]);
+                $existingScore = (int)trim($parts[1]);
+                $key = mb_strtolower($existingName);
+                if (!isset($scoreMap[$key])) {
+                    $scoreMap[$key] = ['name' => $existingName, 'score' => $existingScore];
+                } else {
+                    // In case the file has duplicates, accumulate them
+                    $scoreMap[$key]['score'] += $existingScore;
+                }
+            }
+        }
+    }
+
+    // Merge current user's score (case-insensitive)
+    // Use file previous score as base and avoid decreasing a stored score if session appears stale
+    $userKey = mb_strtolower($nickname);
+    $filePrevious = $scoreMap[$userKey]['score'] ?? 0;
+    $finalScore = max($filePrevious, (int)$overallScore);
+    $scoreMap[$userKey] = ['name' => $nickname, 'score' => $finalScore];
+    // Update session to reflect the canonical final score
+    $_SESSION['overall_score'] = $finalScore;
+
+    // Prepare lines to write back (one entry per username)
+    // Sort by score descending for nice ordering
+    uasort($scoreMap, function($a, $b) {
+        return $b['score'] <=> $a['score'];
+    });
+
+    $outLines = [];
+    foreach ($scoreMap as $entry) {
+        $outLines[] = $entry['name'] . "|" . $entry['score'];
+    }
+
+    // Write the canonicalized leaderboard back to the file with exclusive lock
+    file_put_contents($filename, implode(PHP_EOL, $outLines) . PHP_EOL, LOCK_EX);
+
+    // Ensure the file on disk is canonicalized and sorted for future reads
+    // (This is idempotent because we already wrote the sorted content.)
 }
 ?>
 

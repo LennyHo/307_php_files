@@ -1,8 +1,0 @@
-hellotest123|-2
-hellotest123|-1
-lenny123|-1
-lenny123|5
-Darwase23|-4
-test123|0
-Darwase23|8
-test123|-4
