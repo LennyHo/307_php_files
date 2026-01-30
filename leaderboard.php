@@ -16,20 +16,23 @@ if (file_exists($filename)) {
     foreach ($textLines as $lineNum => $line) {
         $parts = explode("|", $line);
         if (count($parts) == 2) {
-            $name = trim($parts[0]);
+            $rawName = trim($parts[0]);
+            // Use a case-insensitive key so names that differ only by case are combined.
+            $nameKey = mb_strtolower($rawName);
             $score = (int)trim($parts[1]);
-            if (!isset($scoreMap[$name])) {
-                $scoreMap[$name] = $score;
+            if (!isset($scoreMap[$nameKey])) {
+                // Preserve the first-seen display name, but aggregate under the lowercase key
+                $scoreMap[$nameKey] = ['name' => $rawName, 'score' => $score];
             } else {
-                $scoreMap[$name] += $score;
+                $scoreMap[$nameKey]['score'] += $score;
             }
         } else {
             $malformedLines[] = $lineNum + 1;
         }
     }
     // Convert to array for sorting and display
-    foreach ($scoreMap as $name => $score) {
-        $data[] = [$name, $score];
+    foreach ($scoreMap as $entry) {
+        $data[] = [$entry['name'], $entry['score']];
     }
 }
 
