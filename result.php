@@ -11,24 +11,8 @@ $selectedTopic = $_SESSION['selected_topic'] ?? 'Animals';
 $pointsPerQuestion = [];
 $pointsThisRound = 0;
 
-// capture previous cumulative total from the leaderboard file (source of truth)
-$previousTotal = 0;
-$dataFile = __DIR__ . '/data/leaderboard.txt';
-if (file_exists($dataFile)) {
-    $lines = file($dataFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    $nickKey = mb_strtolower($_SESSION['nickname'] ?? '');
-    foreach ($lines as $ln) {
-        $parts = explode("|", $ln);
-        if (count($parts) == 2) {
-            $existingName = trim($parts[0]);
-            $existingScore = (int)trim($parts[1]);
-            if (mb_strtolower($existingName) === $nickKey) {
-                $previousTotal = $existingScore;
-                break;
-            }
-        }
-    }
-}
+// Use session as the source of truth for cumulative score
+$previousTotal = $_SESSION['overall_score'] ?? 0;
 
 // 2. The Grading Loop (calculate points per question)
 foreach ($selectedQuestions as $i => $q) {
@@ -47,8 +31,39 @@ foreach ($selectedQuestions as $i => $q) {
     $pointsThisRound += $pts;
 }
 
-// Add to cumulative total (base on file's previous total)
-$_SESSION['overall_score'] = $previousTotal + $pointsThisRound; // now session matches file-based total
+// Add to cumulative total (base on session's previous total)
+$_SESSION['overall_score'] = $previousTotal + $pointsThisRound;
+
+// Immediately update the leaderboard file with the new cumulative score
+$nickname = $_SESSION['nickname'] ?? 'Guest';
+$filename = __DIR__ . '/data/leaderboard.txt';
+$scoreMap = [];
+if (file_exists($filename)) {
+    $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        $parts = explode("|", $line);
+        if (count($parts) == 2) {
+            $existingName = trim($parts[0]);
+            $existingScore = (int)trim($parts[1]);
+            $key = mb_strtolower($existingName);
+            if (!isset($scoreMap[$key])) {
+                $scoreMap[$key] = ['name' => $existingName, 'score' => $existingScore];
+            } else {
+                $scoreMap[$key]['score'] += $existingScore;
+            }
+        }
+    }
+}
+$userKey = mb_strtolower($nickname);
+$scoreMap[$userKey] = ['name' => $nickname, 'score' => $_SESSION['overall_score']];
+uasort($scoreMap, function($a, $b) {
+    return $b['score'] <=> $a['score'];
+});
+$outLines = [];
+foreach ($scoreMap as $entry) {
+    $outLines[] = $entry['name'] . '|' . $entry['score'];
+}
+file_put_contents($filename, implode(PHP_EOL, $outLines) . PHP_EOL, LOCK_EX);
 
 // Sum positive (correct) and negative (incorrect) points for display
 $correctPoints = 0;
