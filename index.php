@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Capture and clean nickname
-    $_SESSION['nickname'] = trim($_POST['nickname']);
+    $_SESSION['nickname'] = strtolower(trim($_POST['nickname']));
     echo "<script>alert('Welcome, " . htmlspecialchars($_SESSION['nickname']) . "! Get ready for the quiz.');</script>";
 
     // Initialize overall_score from data/leaderboard.txt for this nickname.
