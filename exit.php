@@ -22,7 +22,7 @@ if (isset($_POST['restart'])) {
 if (isset($_SESSION['nickname'])) {
     $entry = $nickname . "|" . $overallScore . PHP_EOL;
     // Append the entry to leaderboard.txt
-    file_put_contents("data/leaderboard.txt", $entry, FILE_APPEND | LOCK_EX);
+    file_put_contents("leaderboard.txt", $entry, FILE_APPEND | LOCK_EX);
 }
 ?>
 

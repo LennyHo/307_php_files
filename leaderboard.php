@@ -5,21 +5,31 @@
 
 session_start();
 
-$filename = "data/leaderboard.txt";
+$filename = "leaderboard.txt";
 $data = [];
 $malformedLines = [];
 
 // 1. Read and parse the file safely
 if (file_exists($filename)) {
     $textLines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $scoreMap = [];
     foreach ($textLines as $lineNum => $line) {
         $parts = explode("|", $line);
         if (count($parts) == 2) {
-            // trim() removes accidental spaces around names or scores
-            $data[] = [trim($parts[0]), (int)trim($parts[1])];
+            $name = trim($parts[0]);
+            $score = (int)trim($parts[1]);
+            if (!isset($scoreMap[$name])) {
+                $scoreMap[$name] = $score;
+            } else {
+                $scoreMap[$name] += $score;
+            }
         } else {
             $malformedLines[] = $lineNum + 1;
         }
+    }
+    // Convert to array for sorting and display
+    foreach ($scoreMap as $name => $score) {
+        $data[] = [$name, $score];
     }
 }
 
