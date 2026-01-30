@@ -53,7 +53,7 @@ if (isset($_SESSION['nickname'])) {
 
     // Prepare lines to write back (one entry per username)
     // Sort by score descending for nice ordering
-    uasort($scoreMap, function($a, $b) {
+    uasort($scoreMap, function ($a, $b) {
         return $b['score'] <=> $a['score'];
     });
 

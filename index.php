@@ -65,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="css/style.css">
 </head>
 <!-- The body contains a simple form for nickname and topic selection. Menu has been removed as requested. -->
+
 <body>
     <div class="container">
         <h1 style="text-align:center;">Welcome to the ISIT307 Quiz!</h1>

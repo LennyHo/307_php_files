@@ -31,7 +31,7 @@ if (file_exists($filename)) {
         }
     }
     // Canonicalize and sort stored leaderboard (case-insensitive uniqueness, score descending)
-    uasort($scoreMap, function($a, $b) {
+    uasort($scoreMap, function ($a, $b) {
         return $b['score'] <=> $a['score'];
     });
 

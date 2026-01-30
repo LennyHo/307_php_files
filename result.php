@@ -56,7 +56,7 @@ if (file_exists($filename)) {
 }
 $userKey = mb_strtolower($nickname);
 $scoreMap[$userKey] = ['name' => $nickname, 'score' => $_SESSION['overall_score']];
-uasort($scoreMap, function($a, $b) {
+uasort($scoreMap, function ($a, $b) {
     return $b['score'] <=> $a['score'];
 });
 $outLines = [];
