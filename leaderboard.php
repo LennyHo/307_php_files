@@ -19,26 +19,29 @@ if (file_exists($filename)) {
             $rawName = trim($parts[0]);
             $score = (int)trim($parts[1]);
             $found = false;
-            foreach ($scoreMap as $k => $entry) {
+            foreach ($scoreMap as $currentScore => $entry) {
                 if (strcasecmp($entry['name'], $rawName) === 0) {
-                    $scoreMap[$k]['score'] += $score;
+                    $scoreMap[$currentScore]['score'] += $score;
                     $found = true;
                     break;
                 }
             }
+            //  Add new entry if not found
             if (!$found) {
                 $scoreMap[] = ['name' => $rawName, 'score' => $score];
             }
+            // Also add to data for display
         } else {
+            // 
             $malformedLines[] = $lineNum + 1;
         }
     }
-    // Canonicalize and sort stored leaderboard (case-insensitive uniqueness, score descending)
+    // Sort stored leaderboard for case-insensitive uniqueness or score descending
     usort($scoreMap, function ($a, $b) {
         return $b['score'] <=> $a['score'];
     });
 
-    // Rewrite file in canonical form (one entry per username, sorted)
+    // one entry per username, sorted by score descending for canonical storage.
     $canonicalLines = [];
     foreach ($scoreMap as $entry) {
         $canonicalLines[] = $entry['name'] . "|" . $entry['score'];
