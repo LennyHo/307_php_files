@@ -2,6 +2,7 @@
 // ========
 // exit.php
 // ========
+
 session_start();
 
 // 1. retreive session data for display and leaderboard entry.
@@ -29,16 +30,21 @@ if (isset($_SESSION['nickname'])) {
         foreach ($lines as $line) {
             $parts = explode("|", $line);
             if (count($parts) == 2) {
+                // Parse existing entry
                 $existingName = trim($parts[0]);
                 $existingScore = (int)trim($parts[1]);
+                // Set to false initially to detect nicknames if found
                 $found = false;
                 foreach ($scoreMap as $k => $entry) {
+                    // if case-insensitive name match with the existing entry, accumulate score
                     if (strcasecmp($entry['name'], $existingName) === 0) {
                         $scoreMap[$k]['score'] += $existingScore;
                         $found = true;
                         break;
                     }
                 }
+
+                // Add new entry if the nickname not found
                 if (!$found) {
                     $scoreMap[] = ['name' => $existingName, 'score' => $existingScore];
                 }
@@ -58,20 +64,6 @@ if (isset($_SESSION['nickname'])) {
             break;
         }
     }
-    if (!$found) {
-        $scoreMap[] = ['name' => $nickname, 'score' => (int)$overallScore];
-    }
-    usort($scoreMap, function ($a, $b) {
-        return $b['score'] <=> $a['score'];
-    });
-    $outLines = [];
-    foreach ($scoreMap as $entry) {
-        $outLines[] = $entry['name'] . "|" . $entry['score'];
-    }
-    file_put_contents($filename, implode(PHP_EOL, $outLines) . PHP_EOL, LOCK_EX);
-
-    // Ensure the file on disk is canonicalized and sorted for future reads
-    // (This is idempotent because we already wrote the sorted content.)
 }
 ?>
 

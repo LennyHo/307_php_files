@@ -5,38 +5,48 @@
 
 session_start();
 
+// leaderboard data file path
 $filename = __DIR__ . "/data/leaderboard.txt";
+
+// Initialize data structures
 $data = [];
 $malformedLines = [];
 
-// 1. Read and parse the file safely
+// Read and parse the file into an associative array for processing and display.
 if (file_exists($filename)) {
+    // Read all lines from the leaderboard file and parse.
     $textLines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     $scoreMap = [];
+    // Parse each line into name and score, accumulating scores for duplicate names (case-insensitive)
     foreach ($textLines as $lineNum => $line) {
+        // Each line format: Name | Score
         $parts = explode("|", $line);
+        // Valid line should have exactly 2 parts
         if (count($parts) == 2) {
+            // Process valid line
             $rawName = trim($parts[0]);
             $score = (int)trim($parts[1]);
             $found = false;
             foreach ($scoreMap as $currentScore => $entry) {
+                // if case-insensitive name match with the existing entry, accumulate score
                 if (strcasecmp($entry['name'], $rawName) === 0) {
                     $scoreMap[$currentScore]['score'] += $score;
                     $found = true;
                     break;
                 }
             }
-            //  Add new entry if not found
+            //  Add new entry if the nickname not found
             if (!$found) {
                 $scoreMap[] = ['name' => $rawName, 'score' => $score];
             }
             // Also add to data for display
         } else {
-            // 
+            // Record malformed line number for reporting or debugging
             $malformedLines[] = $lineNum + 1;
         }
     }
-    // Sort stored leaderboard for case-insensitive uniqueness or score descending
+
+    // Sort stored leaderboard for case-insensitive or score descending
     usort($scoreMap, function ($a, $b) {
         return $b['score'] <=> $a['score'];
     });
@@ -59,7 +69,7 @@ if ($sortType == 'name') {
         return strcasecmp($a[0], $b[0]); // Case-insensitive alphabetical order
     });
 } else {
-    // Default: Sort by score High-Low
+    // Sort by score High-Low
     usort($data, function ($a, $b) {
         return (int)$b[1] - (int)$a[1]; // Highest score first
     });
@@ -82,14 +92,17 @@ if ($sortType == 'name') {
         <div class="table-wrap">
             <table>
                 <thead>
+                    <!-- Sortable column headers -->
                     <tr>
                         <th><a href="leaderboard.php?sort=name">Name (Sort A-Z)</a></th>
                         <th><a href="leaderboard.php?sort=score">Score (Sort High-Low)</a></th>
                     </tr>
                 </thead>
                 <tbody>
+                    <!-- Display leaderboard entries -->
                     <?php foreach ($data as $entry): ?>
                         <tr>
+                            <!-- Escape output to prevent XSS -->
                             <td><?php echo htmlspecialchars($entry[0]); ?></td>
                             <td><?php echo htmlspecialchars($entry[1]); ?></td>
                         </tr>
