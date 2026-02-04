@@ -46,19 +46,10 @@ if (file_exists($filename)) {
         }
     }
 
-    // Sort stored leaderboard for case-insensitive or score descending
-    usort($scoreMap, function ($a, $b) {
-        return $b['score'] <=> $a['score'];
-    });
-
-    // one entry per username, sorted by score descending for canonical storage.
-    $canonicalLines = [];
+    // Only prepare $data for display, do not sort or rewrite leaderboard.txt
     foreach ($scoreMap as $entry) {
-        $canonicalLines[] = $entry['name'] . "|" . $entry['score'];
         $data[] = [$entry['name'], $entry['score']];
     }
-    // If file needs updating, write back sorted canonical content
-    file_put_contents($filename, implode(PHP_EOL, $canonicalLines) . PHP_EOL, LOCK_EX);
 }
 
 // 2. Sort the data based on user selection.

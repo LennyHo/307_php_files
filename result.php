@@ -47,12 +47,14 @@ if (file_exists($filename)) {
             $existingScore = (int)trim($parts[1]);
             $found = false;
             foreach ($scoreMap as $k => $entry) {
+                // if case-insensitive name match with the existing entry, Merge the scores by accumulating
                 if (strcasecmp($entry['name'], $existingName) === 0) {
                     $scoreMap[$k]['score'] += $existingScore;
                     $found = true;
                     break;
                 }
             }
+            // Add new entry for nickname if not found
             if (!$found) {
                 $scoreMap[] = ['name' => $existingName, 'score' => $existingScore];
             }
@@ -71,6 +73,8 @@ for ($k = 0; $k < count($scoreMap); $k++) {
 if (!$found) {
     $scoreMap[] = ['name' => $nickname, 'score' => $_SESSION['overall_score']];
 }
+
+// Sort and write back the updated leaderboard
 usort($scoreMap, function ($a, $b) {
     return $b['score'] <=> $a['score'];
 });
