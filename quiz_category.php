@@ -71,7 +71,7 @@ $_SESSION['current_topic'] = $topic;
         <h2 style="text-align:center;"><?php echo htmlspecialchars($topic); ?> Topic Quiz</h2>
         <p style="text-align:center;">Player: <strong><?php echo htmlspecialchars($_SESSION['nickname']); ?></strong></p>
         <form method="post" action="result.php">
-            <!-- Display selected questions -->
+            <!-- Display questions based on the category from the questions.txt -->
             <?php foreach ($selected as $i => $q): ?>
                 <p><strong>Q<?php echo $i + 1; ?>:</strong> <?php echo htmlspecialchars($q['question']); ?></p>
                 <!-- Input type depends on topic -->
