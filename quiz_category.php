@@ -40,9 +40,16 @@ foreach ($lines as $line) {
     }
 }
 
-// 4. Randomly select 4 questions for the quiz from questions.txt
-shuffle($topicQuestions);
-$selected = array_slice($topicQuestions, 0, 4);
+// 4. Randomly select 4 questions for the quiz from questions.txt using array_rand
+$selected = [];
+if (count($topicQuestions) > 0) {
+    $randKeys = array_rand($topicQuestions, min(4, count($topicQuestions)));
+    // array_rand returns int if only one element, so cast to array
+    $randKeys = (array)$randKeys;
+    foreach ($randKeys as $key) {
+        $selected[] = $topicQuestions[$key];
+    }
+}
 
 // 3. Store answers for marking later
 $_SESSION['current_quiz'] = $selected;
